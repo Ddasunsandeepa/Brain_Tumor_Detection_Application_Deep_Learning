@@ -4,13 +4,19 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 from tensorflow.keras.applications.efficientnet import preprocess_input
 
-MODEL_PATH = "../../model/brain_tumor_model_tf.keras"
+import os
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+MODEL_PATH = os.path.abspath(
+    os.path.join(BASE_DIR, "../../model/brain_tumor_model_tf.keras")
+)
 
 class_names = ['glioma', 'meningioma', 'notumor', 'pituitary']
-
+model = load_model(MODEL_PATH)
 def predict_image(img_path):
-    model = load_model(MODEL_PATH)
-
+    global model
+    
     img = load_img(img_path, target_size=(224, 224))
     img_array = img_to_array(img)
     img_array = preprocess_input(img_array)
@@ -26,14 +32,15 @@ def predict_image(img_path):
         result = "No Tumor"
     else:
         result = f"Tumor: {label}"
-
-    print(f"Prediction: {result}")
-    print(f"Confidence: {confidence*100:.2f}%")
-    plt.imshow(load_img(img_path))
-    plt.title(f"{result} ({confidence*100:.2f}%)")
-    plt.axis('off')
-    plt.show()
+    
+    return result, confidence
+    # print(f"Prediction: {result}")
+    # print(f"Confidence: {confidence*100:.2f}%")
+    # plt.imshow(load_img(img_path))
+    # plt.title(f"{result} ({confidence*100:.2f}%)")
+    # plt.axis('off')
+    # plt.show()
 
 # Example
-if __name__ == "__main__":
-    predict_image("../../data/Testing/glioma/Te-gl_1.jpg")
+# if __name__ == "__main__":
+#     predict_image("../../data/Testing/glioma/Te-gl_1.jpg")
