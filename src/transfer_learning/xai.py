@@ -1,19 +1,33 @@
+# src/transfer_learning/xai.py
 import cv2
 import numpy as np
-import matplotlib.pyplot as plt
 from tensorflow.keras.models import load_model, Model
 from tensorflow.keras.preprocessing.image import load_img, img_to_array
 from tensorflow.keras.applications.efficientnet import preprocess_input
 
-MODEL_PATH = "../../model/brain_tumor_model_tf.keras"
+import os
 
-class_names = ['glioma', 'meningioma', 'notumor', 'pituitary']
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-def explain_image(img_path):
-    model = load_model(MODEL_PATH)
+MODEL_PATH = os.path.abspath(
+    os.path.join(BASE_DIR, "../../model/brain_tumor_model_tf.keras")
+)
+model = load_model(MODEL_PATH)
 
-    # Fix layer index
-    base_model = model.layers[0]
+def generate_heatmap(img_path, output_path):
+    global model
+
+    # Find EfficientNet inside model
+    base_model = None
+    for layer in model.layers:
+        if "efficientnet" in layer.name.lower():
+            base_model = layer
+            break
+
+    if base_model is None:
+        raise ValueError("EfficientNet base model not found!")
+
+    # Get last conv layer
     last_conv_layer = base_model.get_layer("top_conv")
 
     activation_model = Model(
@@ -30,7 +44,8 @@ def explain_image(img_path):
 
     heatmap = np.mean(feature_maps[0], axis=-1)
     heatmap = np.maximum(heatmap, 0)
-    heatmap /= np.max(heatmap)
+    if np.max(heatmap) != 0:
+        heatmap /= np.max(heatmap)
 
     img_cv = cv2.imread(img_path)
     img_cv = cv2.resize(img_cv, (224,224))
@@ -41,11 +56,6 @@ def explain_image(img_path):
 
     overlay = heatmap * 0.4 + img_cv
 
-    plt.imshow(overlay.astype('uint8'))
-    plt.title("Model Attention")
-    plt.axis('off')
-    plt.show()
+    cv2.imwrite(output_path, overlay)
 
-# Example
-if __name__ == "__main__":
-    explain_image("../../data/Testing/glioma/Te-gl_1.jpg")
+    return output_path
