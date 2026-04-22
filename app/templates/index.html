@@ -21,12 +21,12 @@ body {
 } */
 
 .dark-mode::after {
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.4);
 }
 
 .dark-mode .card {
-    background: rgba(30, 30, 30, 0.85);
-    color: white;
+    background: rgba(25, 25, 25, 0.9);
+    color: #eee;
 }
 .dark-mode .bg-image {
     filter: blur(6px) brightness(0.5);
@@ -75,15 +75,25 @@ body {
     overflow-x: hidden;
 }
 
-.bg-image {
+/* .bg-image {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    object-fit: cover;   /* 🔥 key */
+    object-fit: cover;  
     filter: blur(6px);
-    opacity: 0.6;
+    opacity: 0.8;
+    z-index: -2;
+} */
+
+.bg-image {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(2px);
+    opacity: 0.8;
     z-index: -2;
 }
 
@@ -95,7 +105,7 @@ body::after {
     width: 100%;
     height: 100%;
 
-    background: rgba(0, 0, 0, 0.4);
+    background: rgba(0, 0, 0, 0.25);
 
     z-index: -1;
 }
@@ -124,7 +134,7 @@ body::after {
     </div>
 </nav>
 
-<!-- 🔥 MAIN CENTER CARD -->
+
 <div class="main-container">
 
     <div class="card">
@@ -132,7 +142,7 @@ body::after {
         <h3>🧠 AI Brain Tumor Detection</h3>
         <p>Upload MRI Scan</p>
 
-        <!-- 🌙 Dark Mode -->
+
         <button class="btn btn-sm btn-dark mb-2" onclick="toggleDark()">🌙 Toggle Dark</button>
 
         {% if error %}
